@@ -1,0 +1,15 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ── 정상 케이스 (규칙 미발동이어야 함) ──
+ax:camp1 a ax:Campaign ; ax:spend "150000"^^xsd:decimal ; ax:status "운영" .
+ax:ds1 a ax:CleanDataSet ; ax:status "정상" .
+ax:tmplA a ax:ReportTemplate .
+ax:run1 a ax:ReportRun ; ax:hasTemplate ax:tmplA ; ax:consumes ax:ds1 ; ax:status "완료" .
+
+# ── 위반 케이스 (실사례 기반) ──
+# 카카오 환불 조정으로 음수 비용 (R-01)
+ax:camp2 a ax:Campaign ; ax:spend "-3200"^^xsd:decimal ; ax:status "운영" .
+# 템플릿 없이 실패 데이터셋을 소비하는 Run (R-02 + R-03)
+ax:ds2 a ax:CleanDataSet ; ax:status "실패" ; ax:failReason "음수 비용 검출" .
+ax:run2 a ax:ReportRun ; ax:consumes ax:ds2 ; ax:status "생성 중" .

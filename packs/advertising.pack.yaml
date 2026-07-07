@@ -1,0 +1,21 @@
+pack: advertising
+version: 1.0
+seedObjects:
+  - {name: Advertiser, hint: "계약·권한·리포트 기준 주체. 커널 Party extends 권장"}
+  - {name: MediaAccount, hint: "매체 계정 — 인증 만료가 단골 예외"}
+  - {name: Campaign, hint: "매체별 상태 체계 상이 — 내부 대표 상태 + externalStatus 보존"}
+  - {name: RawAdPerformance, hint: "원천과 정제 데이터는 반드시 분리 (신뢰 등급 상이)"}
+  - {name: ExceptionCase, hint: "커널 ExceptionCase extends"}
+referenceStandards:
+  - {name: "IAB 표준 용어", note: "캠페인/라인아이템 명명 대조"}
+  - {name: "schema.org 광고 관련 타입", note: "대체로 불일치 — 내부 업무 언어 우선"}
+regulatoryChecklist:
+  - "개인정보 보존 기간 확인"
+  - "매체별 API 데이터 보존·재배포 약관 확인"
+provenQuestions:
+  - "환불/조정으로 비용이 음수가 되는 경우가 있나요?"
+  - "매체 인증이 만료되면 며칠까지 소급 수집이 가능한가요?"
+  - "광고주에게 이미 전달된 리포트를 다시 만들 때 승인이 필요한가요?"
+knownPitfalls:
+  - "매체별 상태 체계 상이 — 대표 상태 + externalStatus 패턴"
+  - "spend 음수 = 대부분 환불 조정 → 금지 대신 ExceptionCase 오픈이 현실적"

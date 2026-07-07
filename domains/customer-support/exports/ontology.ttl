@@ -1,0 +1,84 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ax: a owl:Ontology .
+
+ax:category a owl:DatatypeProperty ;
+    rdfs:domain ax:Ticket .
+
+ax:customerName a owl:DatatypeProperty ;
+    rdfs:domain ax:Customer .
+
+ax:diagnoses a owl:ObjectProperty ;
+    rdfs:domain ax:Diagnosis ;
+    rdfs:range ax:Ticket .
+
+ax:documentedIn a owl:ObjectProperty ;
+    rdfs:domain ax:Resolution ;
+    rdfs:range ax:KBArticle .
+
+ax:escalates a owl:ObjectProperty ;
+    rdfs:domain ax:EscalationCase ;
+    rdfs:range ax:Ticket .
+
+ax:governedBy a owl:ObjectProperty ;
+    rdfs:domain ax:Ticket ;
+    rdfs:range ax:SLAPolicy .
+
+ax:holds a owl:ObjectProperty ;
+    rdfs:domain ax:Customer ;
+    rdfs:range ax:Contract .
+
+ax:kind a owl:DatatypeProperty ;
+    rdfs:domain ax:Resolution .
+
+ax:priority a owl:DatatypeProperty ;
+    rdfs:domain ax:Ticket .
+
+ax:raisedBy a owl:ObjectProperty ;
+    rdfs:domain ax:Ticket ;
+    rdfs:range ax:Customer .
+
+ax:reason a owl:DatatypeProperty ;
+    rdfs:domain ax:EscalationCase .
+
+ax:refundPolicy a owl:DatatypeProperty ;
+    rdfs:domain ax:Contract .
+
+ax:resolves a owl:ObjectProperty ;
+    rdfs:domain ax:Resolution ;
+    rdfs:range ax:Ticket .
+
+ax:slaDeadline a owl:DatatypeProperty ;
+    rdfs:domain ax:Ticket .
+
+ax:status a owl:DatatypeProperty .
+
+ax:tier a owl:DatatypeProperty ;
+    rdfs:domain ax:Customer .
+
+ax:Diagnosis a owl:Class ;
+    rdfs:label "티켓의 원인 분석 결과. 하나의 티켓에 여러 진단이 있을 수 있다."@ko .
+
+ax:KBArticle a owl:Class ;
+    rdfs:label "재사용 가능한 해결 지식 문서. Resolution에서 승격된다."@ko .
+
+ax:SLAPolicy a owl:Class ;
+    rdfs:label "우선순위별 응답·해결 기한 정책."@ko .
+
+ax:Contract a owl:Class ;
+    rdfs:label "고객과의 지원 계약. 환불·SLA 조건의 근거다."@ko .
+
+ax:EscalationCase a owl:Class ;
+    rdfs:label "SLA 위반 위험·이탈 위험 등 상위 개입이 필요한 예외. 커널 ExceptionCase를 확장한다."@ko .
+
+ax:Resolution a owl:Class ;
+    rdfs:label "티켓을 해결한 조치. 반드시 대상 티켓과 연결되어야 한다."@ko .
+
+ax:Customer a owl:Class ;
+    rdfs:label "지원 요청의 주체인 고객. 커널 Party를 확장한다."@ko .
+
+ax:Ticket a owl:Class ;
+    rdfs:label "고객이 제기한 하나의 문제 단위. 접수 채널과 무관하게 문제 1건 = 티켓 1건이다."@ko .
+

@@ -1,0 +1,9 @@
+@prefix ax: <https://example.co/ax/ont#> .
+# 정상
+ax:cust1 a ax:Customer ; ax:customerName "가나다(주)" ; ax:tier "표준" .
+ax:tick1 a ax:Ticket ; ax:priority "P2" ; ax:status "진행 중" ; ax:raisedBy ax:cust1 .
+ax:res1 a ax:Resolution ; ax:kind "안내" ; ax:resolves ax:tick1 .
+# 위반: 잘못된 우선순위 (R-01) + 고객 미연결 (R-03)
+ax:tick2 a ax:Ticket ; ax:priority "P9" ; ax:status "접수" .
+# 위반: 티켓 미연결 Resolution (R-02)
+ax:res2 a ax:Resolution ; ax:kind "환불" .

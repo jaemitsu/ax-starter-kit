@@ -1,0 +1,16 @@
+# 사내 지식 인덱스 (AX Knowledge Index)
+> AI 에이전트는 이 인덱스를 먼저 읽고, 필요한 문서만 선택해 연다.
+
+## 정책 (규범 지식 — 정본)
+- [리포트 재생성 정책](policies/report-regeneration.md): 전달 전/후 재생성 조건과 승인
+- [VIP 광고주 전달 정책](policies/vip-delivery.md): VIP 사전 검수 규정
+- [데이터 보정 정책](policies/data-correction.md): 원본 보존 원칙, 보정 절차, 음수 비용 처리
+- [매체 계정 만료 대응 정책](policies/account-expiry.md): ⚠ 검토 기한 초과 — 확정 답변 금지
+
+## 사례 (경험 지식)
+- [카카오 환불 조정 음수 비용](cases/2026-03-kakao-refund.md)
+- [구글 계정 만료 리포트 지연](cases/2026-05-late-delivery.md)
+
+## 규약
+- 만료된(expires 경과) 문서는 근거로 확정 답변하지 않는다.
+- 정책 인용 시 반드시 문서 경로와 섹션을 명시한다.

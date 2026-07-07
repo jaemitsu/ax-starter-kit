@@ -1,0 +1,142 @@
+ontology:
+  domain: customer-support
+  scope: "고객 문의 접수부터 해결·지식화, 그리고 그 과정의 에스컬레이션까지"
+  outOfScope: [영업, 과금 시스템 자체, 제품 개발]
+  version: 0.9.0
+  competencyQuestions:
+    - {id: CQ-01, question: "지금 SLA 위반 위험이 있는 티켓은 무엇인가?", answeredBy: [Ticket, Ticket.priority, Ticket.slaDeadline]}
+    - {id: CQ-02, question: "이 티켓과 같은 문제의 과거 해결책은?", answeredBy: [Resolution, resolves, documentedIn]}
+    - {id: CQ-03, question: "지금 상위 개입이 필요한 건은 무엇이고 담당자는?", answeredBy: [EscalationCase, escalates]}
+    - {id: CQ-04, question: "이 고객의 계약상 환불이 가능한가?", answeredBy: [Contract, Contract.refundPolicy, holds]}
+    - {id: CQ-05, question: "반복 문의 상위 주제는 무엇인가 (KB화 후보)?", answeredBy: [Ticket.category, KBArticle]}
+
+objectTypes:
+  - name: Customer
+    definition: "지원 요청의 주체인 고객. 커널 Party를 확장한다."
+    alignedWith: "kernel:Party (extends)"
+    justifiedBy: [CQ-04]
+    identity: {key: customerId(UUID), externalIds: [CRM 고객코드], sameness: "CRM 고객코드 기준"}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: 담당 CSM}
+    properties:
+      - {name: customerName, type: string, sourceOfTruth: CRM}
+      - {name: tier, type: enum, allowed: [표준, 엔터프라이즈], sourceOfTruth: CRM}
+    lifecycle: {states: [활성, 휴면, 해지]}
+  - name: Contract
+    definition: "고객과의 지원 계약. 환불·SLA 조건의 근거다."
+    justifiedBy: [CQ-04]
+    identity: {key: contractId(UUID)}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: 담당 CSM}
+    properties:
+      - {name: refundPolicy, type: string, sourceOfTruth: 계약 관리 시스템}
+      - {name: status, type: enum, allowed: [유효, 만료, 해지], sourceOfTruth: 계약 관리 시스템}
+    lifecycle: {states: [유효, 만료, 해지]}
+  - name: Ticket
+    definition: "고객이 제기한 하나의 문제 단위. 접수 채널과 무관하게 문제 1건 = 티켓 1건이다."
+    justifiedBy: [CQ-01, CQ-05]
+    identity: {key: ticketId(UUID), externalIds: [헬프데스크 ticket_no], sameness: "동일 문제 재문의는 기존 티켓 재오픈"}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: 배정된 상담원}
+    properties:
+      - {name: priority, type: enum, allowed: [P1, P2, P3, P4], sourceOfTruth: 트리아지}
+      - {name: status, type: enum, allowed: [접수, 진행 중, 해결, 종결, 재오픈], sourceOfTruth: 헬프데스크}
+      - {name: category, type: string, sourceOfTruth: 트리아지}
+      - {name: slaDeadline, type: date, sourceOfTruth: SLA 정책 계산}
+    lifecycle:
+      states: [접수, 진행 중, 해결, 종결, 재오픈]
+      transitions:
+        - {from: 접수, to: 진행 중, condition: "상담원 배정", via: triage}
+        - {from: 진행 중, to: 해결, condition: "Resolution 연결 필수"}
+        - {from: 해결, to: 종결, condition: "고객 확인 또는 7일 경과"}
+        - {from: 종결, to: 재오픈, condition: "동일 문제 재발"}
+  - name: Diagnosis
+    definition: "티켓의 원인 분석 결과. 하나의 티켓에 여러 진단이 있을 수 있다."
+    justifiedBy: [CQ-02]
+    identity: {key: diagnosisId(UUID)}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: 작성 상담원}
+    lifecycle: {states: [작성 중, 확정]}
+  - name: Resolution
+    definition: "티켓을 해결한 조치. 반드시 대상 티켓과 연결되어야 한다."
+    justifiedBy: [CQ-02]
+    identity: {key: resolutionId(UUID)}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: 처리 상담원}
+    properties:
+      - {name: kind, type: enum, allowed: [안내, 설정 변경, 버그 수정 전달, 환불, 기타], sourceOfTruth: 헬프데스크}
+    lifecycle: {states: [제안, 적용, 확인]}
+  - name: KBArticle
+    definition: "재사용 가능한 해결 지식 문서. Resolution에서 승격된다."
+    justifiedBy: [CQ-05]
+    identity: {key: articleId(UUID)}
+    owner: {typeLevel: 지식관리 담당, instanceLevel: 작성자}
+    lifecycle: {states: [초안, 게시, 폐기]}
+  - name: EscalationCase
+    definition: "SLA 위반 위험·이탈 위험 등 상위 개입이 필요한 예외. 커널 ExceptionCase를 확장한다."
+    alignedWith: "kernel:ExceptionCase (extends)"
+    justifiedBy: [CQ-03]
+    identity: {key: caseId(UUID)}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: CX 리드}
+    properties:
+      - {name: status, type: enum, allowed: [오픈, 처리 중, 해결, 보류], sourceOfTruth: 온톨로지}
+      - {name: reason, type: string, sourceOfTruth: 생성 규칙}
+    lifecycle: {states: [오픈, 처리 중, 해결, 보류]}
+  - name: SLAPolicy
+    definition: "우선순위별 응답·해결 기한 정책."
+    justifiedBy: [CQ-01]
+    identity: {key: policyId}
+    owner: {typeLevel: CX플랫폼팀, instanceLevel: CX 리드}
+    lifecycle: {states: [활성, 폐기]}
+
+linkTypes:
+  - {subject: Ticket, predicate: raisedBy, object: Customer, cardinality: "N:1", required: true}
+  - {subject: Customer, predicate: holds, object: Contract, cardinality: "1:N", required: false}
+  - {subject: Diagnosis, predicate: diagnoses, object: Ticket, cardinality: "N:1", required: true}
+  - {subject: Resolution, predicate: resolves, object: Ticket, cardinality: "N:1", required: true}
+  - {subject: Resolution, predicate: documentedIn, object: KBArticle, cardinality: "N:1", required: false}
+  - {subject: EscalationCase, predicate: escalates, object: Ticket, cardinality: "N:M", required: false}
+  - {subject: Ticket, predicate: governedBy, object: SLAPolicy, cardinality: "N:1", required: false}
+
+rules:
+  - id: R-01
+    kind: invariant
+    statement: "티켓 우선순위는 P1~P4만 허용된다"
+    severity: critical
+    onViolation: "트리아지 재실행 요구"
+    check: {targetClass: Ticket, path: priority, in: [P1, P2, P3, P4]}
+  - id: R-02
+    kind: invariant
+    statement: "Resolution은 반드시 대상 Ticket과 연결(resolves)되어야 한다"
+    severity: critical
+    onViolation: "저장 거부"
+    check: {targetClass: Resolution, path: resolves, minCount: 1}
+  - id: R-03
+    kind: invariant
+    statement: "Ticket은 반드시 고객(raisedBy)과 연결되어야 한다"
+    severity: critical
+    onViolation: "접수 거부, 채널 매핑 점검"
+    check: {targetClass: Ticket, path: raisedBy, minCount: 1}
+  - id: R-04
+    kind: policy
+    statement: "P1 티켓은 30분 내 최초 응답, 위반 시 EscalationCase 자동 오픈"
+    severity: critical
+    onViolation: "EscalationCase 오픈 + CX 리드 라우팅"
+    basis: "SLA 정책 v3"
+  - id: R-05
+    kind: transition
+    statement: "환불 Resolution은 Contract.refundPolicy 확인 전 확정 불가"
+    severity: critical
+    onViolation: "확정 차단, CSM 확인 요청"
+    basis: "재무 규정"
+
+actions:
+  - {name: triage, target: Ticket, precondition: "status=접수", effect: "우선순위·카테고리 부여, 진행 중 전환", permission: [AI-Agent, 상담원], approval: 불필요, autonomy: auto, idempotency: "티켓당 1회", audit: "트리아지 근거"}
+  - {name: respond, target: Ticket, precondition: "status=진행 중", effect: "고객 응답 발송", permission: [AI-Agent, 상담원], approval: "AI 초안은 발송 전 상담원 확인(P1/P2)", autonomy: auto-then-escalate(1), idempotency: "-", audit: "응답 이력"}
+  - {name: escalate, target: Ticket, precondition: "SLA 위험 또는 이탈 신호", effect: "EscalationCase 오픈", permission: [AI-Agent, 상담원], approval: 불필요, autonomy: auto, idempotency: "티켓당 활성 케이스 1개", audit: "에스컬레이션 사유"}
+  - {name: refund, target: Resolution, precondition: "kind=환불, Contract 유효, refundPolicy 충족", effect: "환불 처리 기록", permission: [CSM], approval: "금액 기준 상위 승인", autonomy: human-approval, idempotency: "티켓당 1회", audit: "환불 근거·승인자"}
+  - {name: publishKB, target: KBArticle, precondition: "status=초안, 원본 Resolution 확인", effect: "게시", permission: [지식관리 담당], approval: 불필요, autonomy: human-approval, idempotency: "-", audit: "게시 이력"}
+
+reuse:
+  - {internal: Customer, alignedWith: "kernel:Party", decision: adapt, note: "extends", source: "kernel/kernel.yaml"}
+  - {internal: EscalationCase, alignedWith: "kernel:ExceptionCase", decision: adapt, note: "extends — 광고 도메인 ExceptionCase와 커널 통해 정렬", source: "kernel/kernel.yaml"}
+
+openItems:
+  unconfirmed: ["재오픈 판정 기준(동일 문제)의 구체 규칙 [B: 진술만]"]
+  parkingLot: [만족도 조사, 챗봇 선응대]
+  dataGaps: ["최초 응답 시각이 채널별로 불일치 — 표준화 과제"]

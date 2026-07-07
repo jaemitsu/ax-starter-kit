@@ -1,0 +1,5 @@
+# 기대 위반: 여기 없는 위반이 나오면 오탐, 여기 있는데 안 나오면 미탐 → 둘 다 CI 실패
+expectViolations:
+  - {rule: R-01, focus: camp2}
+  - {rule: R-02, focus: run2}
+  - {rule: R-03, focus: run2}

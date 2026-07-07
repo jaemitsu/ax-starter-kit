@@ -1,0 +1,4 @@
+expectViolations:
+  - {rule: R-01, focus: tick2}
+  - {rule: R-03, focus: tick2}
+  - {rule: R-02, focus: res2}

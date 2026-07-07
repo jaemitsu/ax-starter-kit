@@ -1,0 +1,29 @@
+# 골든 질의셋 — 라우팅 정확도 + 검색 hit@3 회귀 평가.
+# 검색·라우터·문서 변경 시 반드시 이 평가를 통과해야 한다 (ax-tech-stack.md 원칙: 평가셋 없는 변경 금지)
+routing:
+  - {query: "run2가 왜 막혔어?", expect: graph}
+  - {query: "어제 실패한 리포트 몇 건이야?", expect: graph}
+  - {query: "camp2 상태 알려줘", expect: graph}
+  - {query: "이 숫자는 어디서 왔어? 계보 보여줘", expect: graph}
+  - {query: "case1 누가 담당이야?", expect: graph}
+  - {query: "전달 후 재생성 승인이 필요한가?", expect: policy}
+  - {query: "원천 데이터를 수정해도 되나요?", expect: policy}
+  - {query: "VIP 광고주 리포트 자동 전달 규정이 뭐야?", expect: policy}
+  - {query: "보정할 때 꼭 지켜야 하는 절차는?", expect: policy}
+  - {query: "음수 비용 처리 기준이 있어?", expect: policy}
+  - {query: "음수 비용 비슷한 사례 있었어?", expect: experience}
+  - {query: "과거에 계정 만료로 리포트 늦은 적 있어?", expect: experience}
+  - {query: "지난번 환불 조정 건은 어떻게 해결했지?", expect: experience}
+  - {query: "예전에 겪은 카카오 이슈 알려줘", expect: experience}
+retrieval:      # kind 검색에서 기대 문서가 top-3 안에 있어야 함 (hit@3)
+  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md}
+  - {query: "전달된 리포트를 다시 만들어도 되나요?", kind: policy, expectDoc: policies/report-regeneration.md}
+  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md}
+  - {query: "음수 비용 리포트 표기 기준", kind: policy, expectDoc: policies/data-correction.md}
+  - {query: "VIP 광고주 자동 전달", kind: policy, expectDoc: policies/vip-delivery.md}
+  - {query: "음수 비용 환불 사례", kind: experience, expectDoc: cases/2026-03-kakao-refund.md}
+  - {query: "계정 만료 리포트 지연 사례", kind: experience, expectDoc: cases/2026-05-late-delivery.md}
+  - {query: "환불 조정 어떻게 해결했나", kind: experience, expectDoc: cases/2026-03-kakao-refund.md}
+retrieval_top1: # 정확도 상위 요건 — 기대 문서가 1위여야 함
+  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md}
+  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md}

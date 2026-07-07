@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<title>AX 운영 대시보드 — ad-reporting v1.0.0</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+ body{font-family:'Malgun Gothic',sans-serif;margin:0;background:#f6f8fb;color:#1a2233;}
+ header{background:linear-gradient(135deg,#12204d,#2456d6);color:#fff;padding:26px 32px;}
+ h1{margin:0;font-size:22px;} .sub{opacity:.8;font-size:13px;margin-top:4px;}
+ .wrap{max-width:1150px;margin:0 auto;padding:24px 32px;}
+ .cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+ .card{background:#fff;border:1px solid #e3e7ef;border-radius:12px;padding:14px 22px;min-width:150px;}
+ .card b{font-size:26px;display:block;} .card span{color:#5a6478;font-size:13px;}
+ h2{font-size:17px;border-left:5px solid #2456d6;padding-left:10px;margin:28px 0 10px;}
+ table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;}
+ th{background:#0f1f4d;color:#fff;text-align:left;padding:7px 10px;}
+ td{border-bottom:1px solid #e3e7ef;padding:6px 10px;}
+ tr.rejected td{background:#fdeeec;} tr.success td{background:#fbfdfb;}
+ .mer{background:#fff;border:1px solid #e3e7ef;border-radius:12px;padding:16px;overflow-x:auto;}
+ .ok{color:#0e8a5f;font-weight:700;}
+</style></head><body>
+<header><h1>AX 운영 대시보드 — ad-reporting 온톨로지 v1.0.0</h1>
+<div class="sub">판단 루프 시나리오 실행 후 스냅샷 · 생성: gen_dashboard.py</div></header>
+<div class="wrap">
+<div class="cards">
+ <div class="card"><b>11</b><span>객체 인스턴스</span></div>
+ <div class="card"><b class="ok">0</b><span>현재 규칙 위반</span></div>
+ <div class="card"><b>5 / 0</b><span>액션 성공 / 거부</span></div>
+ <div class="card"><b class="ok">5/5</b><span>근거 있는 성공 행동</span></div>
+</div>
+<h2>인스턴스 그래프 (상태 색상)</h2>
+<div class="mer"><pre class="mermaid">graph LR
+  advA["advA<br/>Advertiser<br/>(활성)"]:::ok
+  advV["advV<br/>Advertiser<br/>(활성)"]:::ok
+  accK["accK<br/>MediaAccount<br/>(인증)"]:::ok
+  camp2["camp2<br/>Campaign<br/>(운영)"]:::n
+  raw1["raw1<br/>RawAdPerformance<br/>(수집 완료)"]:::n
+  ds2["ds2<br/>CleanDataSet<br/>(정상)"]:::ok
+  run2["run2<br/>ReportRun<br/>(재생성)"]:::warn
+  run2_r1["run2_r1<br/>ReportRun<br/>(완료)"]:::ok
+  tmplA["tmplA<br/>ReportTemplate<br/>(활성)"]:::ok
+  fileA["fileA<br/>ReportFile<br/>(전달됨)"]:::ok
+  case1["case1<br/>ExceptionCase<br/>(해결)"]:::ok
+  advA -- owns --> accK
+  accK -- contains --> camp2
+  camp2 -- produces --> raw1
+  ds2 -- derivedFrom --> raw1
+  run2 -- consumes --> ds2
+  run2 -- hasTemplate --> tmplA
+  run2 -- forAdvertiser --> advA
+  run2 -- supersededBy --> run2_r1
+  run2_r1 -- consumes --> ds2
+  run2_r1 -- hasTemplate --> tmplA
+  run2_r1 -- forAdvertiser --> advA
+  run2_r1 -- generates --> fileA
+  case1 -- blocks --> run2
+  classDef ok fill:#e9f7f1,stroke:#0e8a5f;
+  classDef bad fill:#fdeeec,stroke:#c0392b;
+  classDef warn fill:#fdf6e9,stroke:#b7791f;
+  classDef n fill:#eaf0ff,stroke:#2456d6;</pre></div>
+<h2>감사 로그 — 모든 행동과 그 근거</h2>
+<table><tr><th>시각</th><th>주체</th><th>액션</th><th>대상</th><th>결과</th><th>근거(grounds)</th><th>거부 사유</th></tr><tr class='success'><td>22:53:40</td><td>AI-Agent</td><td><code>assignCase</code></td><td>case1</td><td>success</td><td>graph:run2, rule:R-01, case:cases/2026-03-kakao-refund.md</td><td></td></tr><tr class='success'><td>22:53:40</td><td>데이터 QA 담당</td><td><code>correctAndApprove</code></td><td>case1</td><td>success</td><td>policies/data-correction.md#절차</td><td></td></tr><tr class='success'><td>22:53:40</td><td>AI-Agent</td><td><code>validate</code></td><td>ds2</td><td>success</td><td>rule:R-01, policies/data-correction.md#절차</td><td></td></tr><tr class='success'><td>22:53:40</td><td>AI-Agent</td><td><code>regenerateReport</code></td><td>run2</td><td>success</td><td>graph:run2, policies/report-regeneration.md#전달 후 재생성</td><td></td></tr><tr class='success'><td>22:53:40</td><td>AI-Agent</td><td><code>deliverReport</code></td><td>fileA</td><td>success</td><td>graph:run2_r1</td><td></td></tr></table>
+<h2>객체 인벤토리</h2>
+<table><tr><th>ID</th><th>타입</th><th>상태</th><th>관계</th></tr><tr><td><code>advA</code></td><td>Advertiser</td><td>활성</td><td>owns→accK</td></tr><tr><td><code>advV</code></td><td>Advertiser</td><td>활성</td><td>-</td></tr><tr><td><code>camp2</code></td><td>Campaign</td><td>운영</td><td>produces→raw1</td></tr><tr><td><code>ds2</code></td><td>CleanDataSet</td><td>정상</td><td>derivedFrom→raw1</td></tr><tr><td><code>case1</code></td><td>ExceptionCase</td><td>해결</td><td>blocks→run2</td></tr><tr><td><code>accK</code></td><td>MediaAccount</td><td>인증</td><td>contains→camp2</td></tr><tr><td><code>raw1</code></td><td>RawAdPerformance</td><td>수집 완료</td><td>-</td></tr><tr><td><code>fileA</code></td><td>ReportFile</td><td>전달됨</td><td>-</td></tr><tr><td><code>run2</code></td><td>ReportRun</td><td>재생성</td><td>consumes→ds2, hasTemplate→tmplA, forAdvertiser→advA, supersededBy→run2_r1</td></tr><tr><td><code>run2_r1</code></td><td>ReportRun</td><td>완료</td><td>consumes→ds2, hasTemplate→tmplA, forAdvertiser→advA, generates→fileA</td></tr><tr><td><code>tmplA</code></td><td>ReportTemplate</td><td>활성</td><td>-</td></tr></table>
+<h2>액션 카탈로그 — AI 자율성 정책</h2>
+<table><tr><th>액션</th><th>대상</th><th>자율성</th><th>승인</th></tr><tr><td><code>collectData</code></td><td>MediaAccount</td><td>auto</td><td>불필요</td></tr><tr><td><code>reconnectAccount</code></td><td>MediaAccount</td><td>human-approval</td><td>불필요</td></tr><tr><td><code>validate</code></td><td>CleanDataSet</td><td>auto</td><td>불필요</td></tr><tr><td><code>assignCase</code></td><td>ExceptionCase</td><td>auto</td><td>불필요</td></tr><tr><td><code>correctAndApprove</code></td><td>ExceptionCase</td><td>human-approval</td><td>사유 기록 필수</td></tr><tr><td><code>regenerateReport</code></td><td>ReportRun</td><td>auto-then-escalate(1)</td><td>전달 후 재생성은 팀장 승인</td></tr><tr><td><code>deliverReport</code></td><td>ReportFile</td><td>auto-then-escalate(1)</td><td>VIP 광고주는 담당자 확인</td></tr></table>
+</div><script>mermaid.initialize({startOnLoad:true,securityLevel:'loose'});</script></body></html>

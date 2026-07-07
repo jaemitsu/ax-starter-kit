@@ -1,0 +1,26 @@
+kernel:
+  version: 0.1.0
+  steward: "AI 플랫폼 팀"
+  principle: "2개 이상 도메인이 쓰는 개념만 승격한다"
+
+objectTypes:
+  - name: Party
+    definition: "계약·권한·책임의 주체가 되는 개인 또는 조직. 특정 역할(광고주, 고객)은 도메인에서 extends로 정의한다."
+    identity: {key: partyId(UUID), sameness: "사업자번호/법인 기준. 명칭 변경은 동일 Party"}
+    owner: {typeLevel: "커널 스튜어드", instanceLevel: "도메인별 지정"}
+    lifecycle: {states: [활성, 중지, 종료]}
+  - name: Document
+    definition: "업무 산출물로서 전달·보관되는 파일 또는 문서."
+    identity: {key: documentId(UUID)}
+    owner: {typeLevel: "커널 스튜어드", instanceLevel: "생성 도메인"}
+    lifecycle: {states: [생성됨, 전달됨, 만료]}
+  - name: ExceptionCase
+    definition: "자동 처리에서 벗어나 수동 보정·승인·재처리가 필요한 업무 예외. 로그가 아니라 상태와 담당자를 가진 관리 대상이다."
+    identity: {key: caseId(UUID)}
+    owner: {typeLevel: "커널 스튜어드", instanceLevel: "라우팅 규칙에 따름"}
+    lifecycle:
+      states: [오픈, 처리 중, 해결, 보류]
+      transitions:
+        - {from: 오픈, to: 처리 중, condition: "담당자 배정"}
+        - {from: 처리 중, to: 해결, condition: "보정·승인 완료, 사유 기록 필수"}
+        - {from: 처리 중, to: 보류, condition: "외부 의존 대기, 사유 기록 필수"}

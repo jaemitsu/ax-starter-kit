@@ -1,0 +1,28 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ── 시나리오: "월요일 아침 — A광고주 리포트가 왜 안 나갔나" ──
+ax:advA a ax:Advertiser ; ax:advertiserName "A광고주" ; ax:tier "표준" ; ax:status "활성" .
+ax:advV a ax:Advertiser ; ax:advertiserName "V광고주" ; ax:tier "VIP" ; ax:status "활성" .
+
+ax:accK a ax:MediaAccount ; ax:media "kakao" ; ax:status "인증" .
+ax:advA ax:owns ax:accK .
+
+ax:camp2 a ax:Campaign ; ax:campaignName "여름 프로모션" ; ax:status "운영" ;
+         ax:externalStatus "ELIGIBLE" ; ax:spend "-3200"^^xsd:decimal .
+ax:accK ax:contains ax:camp2 .
+
+ax:raw1 a ax:RawAdPerformance ; ax:status "수집 완료" ; ax:collectedAt "2026-07-06"^^xsd:date .
+ax:camp2 ax:produces ax:raw1 .
+
+ax:ds2 a ax:CleanDataSet ; ax:status "실패" ; ax:failReason "음수 비용 검출 (R-01)" .
+ax:ds2 ax:derivedFrom ax:raw1 .
+
+ax:tmplA a ax:ReportTemplate ; ax:status "활성" .
+
+ax:run2 a ax:ReportRun ; ax:status "실패" ; ax:failureReason "데이터 검증 실패" ;
+        ax:triggeredBy "스케줄" .
+ax:run2 ax:consumes ax:ds2 ; ax:hasTemplate ax:tmplA ; ax:forAdvertiser ax:advA .
+
+ax:case1 a ax:ExceptionCase ; ax:status "오픈" ; ax:reason "R-01 위반: camp2 spend -3200 (환불 조정 추정)" .
+ax:case1 ax:blocks ax:run2 .

@@ -1,0 +1,15 @@
+name: ontology-ci
+on:
+  pull_request:
+    paths: ["domains/**", "kernel/**", "tools/**"]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install rdflib pyshacl pyyaml
+      - name: Validate all domains
+        run: |
+          for d in domains/*/; do python tools/validate.py "$d"; done

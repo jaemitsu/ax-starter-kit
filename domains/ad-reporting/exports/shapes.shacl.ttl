@@ -1,0 +1,27 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ax:Shape_R_01 a sh:NodeShape ;
+    sh:property [ sh:datatype xsd:decimal ;
+            sh:message "R-01 위반: 비용(spend)은 0 이상이어야 한다 — CleanDataSet 검증 실패 처리 + ExceptionCase 자동 오픈" ;
+            sh:minInclusive 0.0 ;
+            sh:path ax:spend ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:Campaign .
+
+ax:Shape_R_02 a sh:NodeShape ;
+    sh:property [ sh:hasValue "정상" ;
+            sh:message "R-02 위반: ReportRun은 status가 '정상'인 CleanDataSet만 소비할 수 있다 — Run 시작 차단, 사유 로그" ;
+            sh:path ( ax:consumes ax:status ) ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:ReportRun .
+
+ax:Shape_R_03 a sh:NodeShape ;
+    sh:property [ sh:message "R-03 위반: ReportRun에는 ReportTemplate이 필수다 — Run 생성 거부" ;
+            sh:minCount 1 ;
+            sh:path ax:hasTemplate ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:ReportRun .
+

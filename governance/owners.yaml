@@ -1,0 +1,8 @@
+approvalMatrix:
+  PATCH: {desc: "설명·동의어·오타", approver: 자동}
+  MINOR: {desc: "하위 호환 요소 추가", approver: 도메인 owner}
+  MAJOR: {desc: "상태 머신·객체 재편, CQ 파괴", approver: "도메인 owner + 영향분석 + 소비자 공지"}
+  KERNEL: {desc: "공유 커널 변경", approver: "커널 스튜어드 (2개 도메인 이상 수요)"}
+  AUTONOMY: {desc: "액션 자율성 변경", approver: "관리자급 필수"}
+domains:
+  ad-reporting: {owner: 미지정, facilitator: 미지정}

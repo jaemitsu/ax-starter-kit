@@ -1,0 +1,26 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ax:Shape_R_01 a sh:NodeShape ;
+    sh:property [ sh:in ( "P1" "P2" "P3" "P4" ) ;
+            sh:message "R-01 위반: 티켓 우선순위는 P1~P4만 허용된다 — 트리아지 재실행 요구" ;
+            sh:path ax:priority ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:Ticket .
+
+ax:Shape_R_02 a sh:NodeShape ;
+    sh:property [ sh:message "R-02 위반: Resolution은 반드시 대상 Ticket과 연결(resolves)되어야 한다 — 저장 거부" ;
+            sh:minCount 1 ;
+            sh:path ax:resolves ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:Resolution .
+
+ax:Shape_R_03 a sh:NodeShape ;
+    sh:property [ sh:message "R-03 위반: Ticket은 반드시 고객(raisedBy)과 연결되어야 한다 — 접수 거부, 채널 매핑 점검" ;
+            sh:minCount 1 ;
+            sh:path ax:raisedBy ;
+            sh:severity sh:Violation ] ;
+    sh:targetClass ax:Ticket .
+

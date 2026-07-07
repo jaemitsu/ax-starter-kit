@@ -1,0 +1,107 @@
+@prefix ax: <https://example.co/ax/ont#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ax: a owl:Ontology .
+
+ax:advertiserName a owl:DatatypeProperty ;
+    rdfs:domain ax:Advertiser .
+
+ax:blocks a owl:ObjectProperty ;
+    rdfs:domain ax:ExceptionCase ;
+    rdfs:range ax:ReportRun .
+
+ax:campaignName a owl:DatatypeProperty ;
+    rdfs:domain ax:Campaign .
+
+ax:collectedAt a owl:DatatypeProperty ;
+    rdfs:domain ax:RawAdPerformance .
+
+ax:consumes a owl:ObjectProperty ;
+    rdfs:domain ax:ReportRun ;
+    rdfs:range ax:CleanDataSet .
+
+ax:contains a owl:ObjectProperty ;
+    rdfs:domain ax:MediaAccount ;
+    rdfs:range ax:Campaign .
+
+ax:derivedFrom a owl:ObjectProperty ;
+    rdfs:domain ax:CleanDataSet ;
+    rdfs:range ax:RawAdPerformance .
+
+ax:externalStatus a owl:DatatypeProperty ;
+    rdfs:domain ax:Campaign .
+
+ax:failReason a owl:DatatypeProperty ;
+    rdfs:domain ax:CleanDataSet .
+
+ax:failureReason a owl:DatatypeProperty ;
+    rdfs:domain ax:ReportRun .
+
+ax:forAdvertiser a owl:ObjectProperty ;
+    rdfs:domain ax:ReportRun ;
+    rdfs:range ax:Advertiser .
+
+ax:generates a owl:ObjectProperty ;
+    rdfs:domain ax:ReportRun ;
+    rdfs:range ax:ReportFile .
+
+ax:hasTemplate a owl:ObjectProperty ;
+    rdfs:domain ax:ReportRun ;
+    rdfs:range ax:ReportTemplate .
+
+ax:media a owl:DatatypeProperty ;
+    rdfs:domain ax:MediaAccount .
+
+ax:owns a owl:ObjectProperty ;
+    rdfs:domain ax:Advertiser ;
+    rdfs:range ax:MediaAccount .
+
+ax:produces a owl:ObjectProperty ;
+    rdfs:domain ax:Campaign ;
+    rdfs:range ax:RawAdPerformance .
+
+ax:reason a owl:DatatypeProperty ;
+    rdfs:domain ax:ExceptionCase .
+
+ax:spend a owl:DatatypeProperty ;
+    rdfs:domain ax:Campaign .
+
+ax:status a owl:DatatypeProperty .
+
+ax:supersededBy a owl:ObjectProperty ;
+    rdfs:domain ax:ReportRun .
+
+ax:tier a owl:DatatypeProperty ;
+    rdfs:domain ax:Advertiser .
+
+ax:triggeredBy a owl:DatatypeProperty ;
+    rdfs:domain ax:ReportRun .
+
+ax:ReportFile a owl:Class ;
+    rdfs:label "ReportRun이 산출한 전달물 파일. 커널 Document를 확장한다."@ko .
+
+ax:ReportTemplate a owl:Class ;
+    rdfs:label "리포트 산출 형식과 지표 구성을 정의한 템플릿. 모든 ReportRun에 필수다."@ko .
+
+ax:ExceptionCase a owl:Class ;
+    rdfs:label "수동 보정·승인·재처리가 필요한 예외. 미해결(오픈/처리 중) 상태는 연관 ReportRun을 차단한다."@ko .
+
+ax:CleanDataSet a owl:Class ;
+    rdfs:label "정제·검증이 끝난 리포트용 데이터셋. status가 '정상'인 것만 ReportRun이 소비할 수 있다."@ko .
+
+ax:MediaAccount a owl:Class ;
+    rdfs:label "네이버/구글/카카오 등 매체 플랫폼의 광고 계정. 데이터 수집의 인증 단위다."@ko .
+
+ax:RawAdPerformance a owl:Class ;
+    rdfs:label "매체 API에서 수집된 가공 전 원천 성과 데이터. 신뢰 등급 '원천'이며 검증 전에는 리포트에 사용할 수 없다."@ko .
+
+ax:Advertiser a owl:Class ;
+    rdfs:label "광고 계약의 주체이며 리포트 전달의 기준이 되는 광고주. 대행 관계의 최종 클라이언트를 말하며, 매체 계정 소유자와 다를 수 있다."@ko .
+
+ax:Campaign a owl:Class ;
+    rdfs:label "매체 내 광고 캠페인. 내부 대표 상태를 기준으로 관리하며 매체 원본 상태는 externalStatus로 보존한다."@ko .
+
+ax:ReportRun a owl:Class ;
+    rdfs:label "특정 광고주·기간·템플릿 조합에 대해 특정 시점에 수행된 리포트 생성 실행. 동일 조건이라도 실행 시점이 다르면 다른 ReportRun이다."@ko .
+
