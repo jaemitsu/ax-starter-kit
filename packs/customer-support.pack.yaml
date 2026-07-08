@@ -1,0 +1,25 @@
+pack: customer-support
+version: 1.0
+seedObjects:
+  - {name: Customer, hint: "지원 요청 주체. 커널 Party extends 권장 — CRM 고객코드로 sameness"}
+  - {name: Ticket, hint: "문제 1건 = 티켓 1건. 채널(메일/챗/전화)과 분리할 것 — 채널별 티켓 분리는 중복 지옥"}
+  - {name: Resolution, hint: "해결 조치는 티켓과 별도 객체로 — KB 승격의 원천이자 반복 문의 분석의 단위"}
+  - {name: EscalationCase, hint: "커널 ExceptionCase extends — SLA 위반 위험·이탈 신호가 단골 트리거"}
+  - {name: SLAPolicy, hint: "우선순위별 기한을 데이터로 — 코드에 박으면 정책 개정 때마다 배포"}
+referenceStandards:
+  - {name: "ITIL 인시던트 관리 용어", note: "Incident/Problem 구분 참고 — 소규모 조직은 Ticket 단일로 시작해도 무방"}
+  - {name: "schema.org ContactPoint/Ticket 유사 타입", note: "대체로 불일치 — 내부 업무 언어 우선"}
+regulatoryChecklist:
+  - "고객 개인정보(연락처·대화 이력) 보존 기간과 파기 절차 확인"
+  - "환불 처리의 전자상거래법상 기한(청약철회 등) 확인"
+  - "녹취·채팅 로그의 동의 및 열람 권한 확인"
+provenQuestions:
+  - "같은 고객이 같은 문제로 다시 문의하면 새 티켓인가요, 재오픈인가요?"
+  - "P1 최초 응답 기한을 넘기면 누구에게 언제 알림이 가나요?"
+  - "환불은 상담원이 바로 처리할 수 있나요, 승인이 필요한가요?"
+  - "해결된 티켓의 조치 내용은 어떻게 KB 문서가 되나요?"
+knownPitfalls:
+  - "채널별 최초 응답 시각 기준 불일치 — SLA 계산이 채널마다 다르면 지표 신뢰 붕괴"
+  - "재오픈 판정 기준 부재 → 재오픈률/신규 티켓 수 지표가 상담원 재량에 오염"
+  - "환불 Resolution을 계약(refundPolicy) 확인 없이 확정 — 재무 규정 위반의 단골 경로"
+  - "KB 문서 검토 기한 미관리 → 만료 지식이 확정 답변 근거로 재사용되는 사고"

@@ -2,14 +2,27 @@
 > AI 에이전트는 이 인덱스를 먼저 읽고, 필요한 문서만 선택해 연다.
 
 ## 정책 (규범 지식 — 정본)
+
+### 광고 리포팅 (ad-reporting)
 - [리포트 재생성 정책](policies/report-regeneration.md): 전달 전/후 재생성 조건과 승인
 - [VIP 광고주 전달 정책](policies/vip-delivery.md): VIP 사전 검수 규정
 - [데이터 보정 정책](policies/data-correction.md): 원본 보존 원칙, 보정 절차, 음수 비용 처리
 - [매체 계정 만료 대응 정책](policies/account-expiry.md): ⚠ 검토 기한 초과 — 확정 답변 금지
 
+### 고객 지원 (customer-support)
+- [에스컬레이션 SLA 정책](policies/escalation-sla.md): 우선순위별 기한, 자동 에스컬레이션, 상위 개입 기준
+- [고객 환불 처리 정책](policies/refund-policy.md): 계약 확인 선행, 금액별 승인 기준, 금지 사항
+- [티켓 재오픈 판정 정책](policies/ticket-reopen.md): 재오픈 vs 신규 접수 판정 기준과 절차
+
 ## 사례 (경험 지식)
+
+### 광고 리포팅 (ad-reporting)
 - [카카오 환불 조정 음수 비용](cases/2026-03-kakao-refund.md)
 - [구글 계정 만료 리포트 지연](cases/2026-05-late-delivery.md)
+
+### 고객 지원 (customer-support)
+- [엔터프라이즈 P1 에스컬레이션 지연](cases/2026-04-enterprise-p1-escalation.md)
+- [중복 결제 티켓 이중 처리 시도](cases/2026-06-duplicate-billing-ticket.md)
 
 ## 규약
 - 만료된(expires 경과) 문서는 근거로 확정 답변하지 않는다.
