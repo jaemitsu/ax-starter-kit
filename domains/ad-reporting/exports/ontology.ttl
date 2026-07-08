@@ -53,6 +53,9 @@ ax:hasTemplate a owl:ObjectProperty ;
 ax:media a owl:DatatypeProperty ;
     rdfs:domain ax:MediaAccount .
 
+ax:outputFormat a owl:DatatypeProperty ;
+    rdfs:domain ax:ReportTemplate .
+
 ax:owns a owl:ObjectProperty ;
     rdfs:domain ax:Advertiser ;
     rdfs:range ax:MediaAccount .
@@ -72,17 +75,20 @@ ax:status a owl:DatatypeProperty .
 ax:supersededBy a owl:ObjectProperty ;
     rdfs:domain ax:ReportRun .
 
+ax:templateName a owl:DatatypeProperty ;
+    rdfs:domain ax:ReportTemplate .
+
 ax:tier a owl:DatatypeProperty ;
     rdfs:domain ax:Advertiser .
 
 ax:triggeredBy a owl:DatatypeProperty ;
     rdfs:domain ax:ReportRun .
 
+ax:version a owl:DatatypeProperty ;
+    rdfs:domain ax:ReportTemplate .
+
 ax:ReportFile a owl:Class ;
     rdfs:label "ReportRun이 산출한 전달물 파일. 커널 Document를 확장한다."@ko .
-
-ax:ReportTemplate a owl:Class ;
-    rdfs:label "리포트 산출 형식과 지표 구성을 정의한 템플릿. 모든 ReportRun에 필수다."@ko .
 
 ax:ExceptionCase a owl:Class ;
     rdfs:label "수동 보정·승인·재처리가 필요한 예외. 미해결(오픈/처리 중) 상태는 연관 ReportRun을 차단한다."@ko .
@@ -98,6 +104,9 @@ ax:RawAdPerformance a owl:Class ;
 
 ax:Advertiser a owl:Class ;
     rdfs:label "광고 계약의 주체이며 리포트 전달의 기준이 되는 광고주. 대행 관계의 최종 클라이언트를 말하며, 매체 계정 소유자와 다를 수 있다."@ko .
+
+ax:ReportTemplate a owl:Class ;
+    rdfs:label "리포트 산출 형식과 지표 구성을 정의한 템플릿. 모든 ReportRun에 필수다."@ko .
 
 ax:Campaign a owl:Class ;
     rdfs:label "매체 내 광고 캠페인. 내부 대표 상태를 기준으로 관리하며 매체 원본 상태는 externalStatus로 보존한다."@ko .

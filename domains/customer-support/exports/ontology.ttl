@@ -7,6 +7,9 @@ ax: a owl:Ontology .
 ax:category a owl:DatatypeProperty ;
     rdfs:domain ax:Ticket .
 
+ax:confidence a owl:DatatypeProperty ;
+    rdfs:domain ax:Diagnosis .
+
 ax:customerName a owl:DatatypeProperty ;
     rdfs:domain ax:Customer .
 
@@ -17,6 +20,9 @@ ax:diagnoses a owl:ObjectProperty ;
 ax:documentedIn a owl:ObjectProperty ;
     rdfs:domain ax:Resolution ;
     rdfs:range ax:KBArticle .
+
+ax:effectiveFrom a owl:DatatypeProperty ;
+    rdfs:domain ax:SLAPolicy .
 
 ax:escalates a owl:ObjectProperty ;
     rdfs:domain ax:EscalationCase ;
@@ -32,6 +38,9 @@ ax:holds a owl:ObjectProperty ;
 
 ax:kind a owl:DatatypeProperty ;
     rdfs:domain ax:Resolution .
+
+ax:lastReviewedAt a owl:DatatypeProperty ;
+    rdfs:domain ax:KBArticle .
 
 ax:priority a owl:DatatypeProperty ;
     rdfs:domain ax:Ticket .
@@ -50,6 +59,9 @@ ax:resolves a owl:ObjectProperty ;
     rdfs:domain ax:Resolution ;
     rdfs:range ax:Ticket .
 
+ax:rootCause a owl:DatatypeProperty ;
+    rdfs:domain ax:Diagnosis .
+
 ax:slaDeadline a owl:DatatypeProperty ;
     rdfs:domain ax:Ticket .
 
@@ -58,14 +70,11 @@ ax:status a owl:DatatypeProperty .
 ax:tier a owl:DatatypeProperty ;
     rdfs:domain ax:Customer .
 
-ax:Diagnosis a owl:Class ;
-    rdfs:label "티켓의 원인 분석 결과. 하나의 티켓에 여러 진단이 있을 수 있다."@ko .
+ax:title a owl:DatatypeProperty ;
+    rdfs:domain ax:KBArticle .
 
-ax:KBArticle a owl:Class ;
-    rdfs:label "재사용 가능한 해결 지식 문서. Resolution에서 승격된다."@ko .
-
-ax:SLAPolicy a owl:Class ;
-    rdfs:label "우선순위별 응답·해결 기한 정책."@ko .
+ax:version a owl:DatatypeProperty ;
+    rdfs:domain ax:SLAPolicy .
 
 ax:Contract a owl:Class ;
     rdfs:label "고객과의 지원 계약. 환불·SLA 조건의 근거다."@ko .
@@ -73,8 +82,17 @@ ax:Contract a owl:Class ;
 ax:EscalationCase a owl:Class ;
     rdfs:label "SLA 위반 위험·이탈 위험 등 상위 개입이 필요한 예외. 커널 ExceptionCase를 확장한다."@ko .
 
+ax:Diagnosis a owl:Class ;
+    rdfs:label "티켓의 원인 분석 결과. 하나의 티켓에 여러 진단이 있을 수 있다."@ko .
+
+ax:KBArticle a owl:Class ;
+    rdfs:label "재사용 가능한 해결 지식 문서. Resolution에서 승격된다."@ko .
+
 ax:Resolution a owl:Class ;
     rdfs:label "티켓을 해결한 조치. 반드시 대상 티켓과 연결되어야 한다."@ko .
+
+ax:SLAPolicy a owl:Class ;
+    rdfs:label "우선순위별 응답·해결 기한 정책."@ko .
 
 ax:Customer a owl:Class ;
     rdfs:label "지원 요청의 주체인 고객. 커널 Party를 확장한다."@ko .

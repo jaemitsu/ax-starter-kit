@@ -174,6 +174,22 @@ objectTypes:
     - 중지
     - 종료
     - 보관
+    transitions:
+    - from: 운영
+      to: 중지
+      condition: 예산 소진 또는 광고주 요청 (매체 원본 상태는 externalStatus 보존)
+    - from: 중지
+      to: 운영
+      condition: 재개 요청 + 매체 상태 동기화 확인
+    - from: 운영
+      to: 종료
+      condition: 캠페인 기간 종료
+    - from: 중지
+      to: 종료
+      condition: 재개 없이 캠페인 기간 종료
+    - from: 종료
+      to: 보관
+      condition: 종료 후 90일 경과 (자동)
 - name: RawAdPerformance
   definition: 매체 API에서 수집된 가공 전 원천 성과 데이터. 신뢰 등급 '원천'이며 검증 전에는 리포트에 사용할 수 없다.
   justifiedBy:
@@ -199,6 +215,17 @@ objectTypes:
     - 수집 대기
     - 수집 완료
     - 수집 실패
+    transitions:
+    - from: 수집 대기
+      to: 수집 완료
+      condition: 수집기 정상 응답 (계정+일자 멱등)
+      via: collectData
+    - from: 수집 대기
+      to: 수집 실패
+      condition: 매체 API 오류·타임아웃·인증 실패
+    - from: 수집 실패
+      to: 수집 대기
+      condition: 재시도 큐 재등록 (매체별 소급 가능 기간 내)
 - name: CleanDataSet
   definition: 정제·검증이 끝난 리포트용 데이터셋. status가 '정상'인 것만 ReportRun이 소비할 수 있다.
   justifiedBy:
@@ -309,10 +336,28 @@ objectTypes:
   owner:
     typeLevel: 리포트 운영팀
     instanceLevel: 템플릿 작성자
+  properties:
+  - name: templateName
+    type: string
+    sourceOfTruth: 리포트 운영 시스템
+  - name: version
+    type: string
+    sourceOfTruth: 리포트 운영 시스템
+  - name: outputFormat
+    type: enum
+    allowed:
+    - PDF
+    - XLSX
+    - 대시보드
+    sourceOfTruth: 리포트 운영 시스템
   lifecycle:
     states:
     - 활성
     - 폐기
+    transitions:
+    - from: 활성
+      to: 폐기
+      condition: 신규 버전으로 대체 완료 + 사용 중인 정기 리포트 0건 확인
 - name: ReportFile
   definition: ReportRun이 산출한 전달물 파일. 커널 Document를 확장한다.
   alignedWith: kernel:Document (extends)
@@ -336,6 +381,17 @@ objectTypes:
     - 생성됨
     - 전달됨
     - 만료
+    transitions:
+    - from: 생성됨
+      to: 전달됨
+      condition: 생성 Run 완료 + R-05 통과 (VIP는 담당자 확인)
+      via: deliverReport
+    - from: 전달됨
+      to: 만료
+      condition: 보존 기한 경과 (계약별 보존 정책)
+    - from: 생성됨
+      to: 만료
+      condition: 미전달 상태로 파기 기한 경과
 - name: ExceptionCase
   definition: 수동 보정·승인·재처리가 필요한 예외. 미해결(오픈/처리 중) 상태는 연관 ReportRun을 차단한다.
   alignedWith: kernel:ExceptionCase (extends)
@@ -368,10 +424,17 @@ objectTypes:
     - from: 오픈
       to: 처리 중
       condition: 담당자 배정
+      via: assignCase
     - from: 처리 중
       to: 해결
       condition: 보정 사유 기록 필수
       via: correctAndApprove
+    - from: 처리 중
+      to: 보류
+      condition: 매체사 회신 등 외부 의존 대기
+    - from: 보류
+      to: 처리 중
+      condition: 외부 의존 해소
 linkTypes:
 - subject: Advertiser
   predicate: owns
