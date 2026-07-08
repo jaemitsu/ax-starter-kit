@@ -1,29 +1,111 @@
-# 골든 질의셋 — 라우팅 정확도 + 검색 hit@3 회귀 평가.
+# 골든 질의셋 v2 — 100문항. 라우팅 정확도 + 검색 hit@3 + top-1 회귀 평가.
 # 검색·라우터·문서 변경 시 반드시 이 평가를 통과해야 한다 (ax-tech-stack.md 원칙: 평가셋 없는 변경 금지)
+# 구성: routing 60 (graph 20 / policy 20 / experience 20) · retrieval 30 · retrieval_top1 10
+# 태그: difficulty(easy/medium/hard) · domain(ad-reporting/customer-support) · tags(ambiguous/multi-hop/negation)
+# 합격 기준: easy/medium 100%, hard ≥ 90% (evals/run_evals.py 참조)
 routing:
-  - {query: "run2가 왜 막혔어?", expect: graph}
-  - {query: "어제 실패한 리포트 몇 건이야?", expect: graph}
-  - {query: "camp2 상태 알려줘", expect: graph}
-  - {query: "이 숫자는 어디서 왔어? 계보 보여줘", expect: graph}
-  - {query: "case1 누가 담당이야?", expect: graph}
-  - {query: "전달 후 재생성 승인이 필요한가?", expect: policy}
-  - {query: "원천 데이터를 수정해도 되나요?", expect: policy}
-  - {query: "VIP 광고주 리포트 자동 전달 규정이 뭐야?", expect: policy}
-  - {query: "보정할 때 꼭 지켜야 하는 절차는?", expect: policy}
-  - {query: "음수 비용 처리 기준이 있어?", expect: policy}
-  - {query: "음수 비용 비슷한 사례 있었어?", expect: experience}
-  - {query: "과거에 계정 만료로 리포트 늦은 적 있어?", expect: experience}
-  - {query: "지난번 환불 조정 건은 어떻게 해결했지?", expect: experience}
-  - {query: "예전에 겪은 카카오 이슈 알려줘", expect: experience}
+  # ── graph (20) ─────────────────────────────────────────────
+  - {query: "run2가 왜 막혔어?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "어제 실패한 리포트 몇 건이야?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "camp2 상태 알려줘", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "이 숫자는 어디서 왔어? 계보 보여줘", expect: graph, difficulty: easy, domain: ad-reporting, tags: [multi-hop]}
+  - {query: "case1 누가 담당이야?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "run2 계보 추적해줘", expect: graph, difficulty: easy, domain: ad-reporting, tags: [multi-hop]}
+  - {query: "camp2는 지금 어떤 상태야?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "ds2 검증이 왜 막혀 있는지 보여줘", expect: graph, difficulty: medium, domain: ad-reporting}
+  - {query: "advV로 연결된 리포트 실행 몇 건이야?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "이 숫자 어디서 왔는지 원천까지 추적해줘", expect: graph, difficulty: medium, domain: ad-reporting, tags: [multi-hop, ambiguous]}
+  - {query: "실패한 run 다시 몇 건인지 현재 기준으로", expect: graph, difficulty: medium, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "case1이 차단하고 있는 리포트가 뭐야?", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "accK 인증 만료된 계정 상태 확인해줘", expect: graph, difficulty: easy, domain: ad-reporting}
+  - {query: "P1 티켓 중 지금 SLA 위반 위험인 건 몇 건이야?", expect: graph, difficulty: medium, domain: customer-support}
+  - {query: "이 티켓 누가 담당이야?", expect: graph, difficulty: easy, domain: customer-support}
+  - {query: "에스컬레이션 케이스 현재 상태 보여줘", expect: graph, difficulty: easy, domain: customer-support}
+  - {query: "고객 문의가 어느 계약과 연결돼 있어?", expect: graph, difficulty: medium, domain: customer-support, tags: [multi-hop]}
+  - {query: "재오픈된 티켓이 왜 안 닫히는지 알려줘", expect: graph, difficulty: medium, domain: customer-support, tags: [negation]}
+  - {query: "이번 주 해결 안 된 티켓 계보 좀 봐줘", expect: graph, difficulty: hard, domain: customer-support, tags: [negation, multi-hop]}
+  - {query: "장애 티켓과 연결된 진단 기록이 지금 몇 건이지?", expect: graph, difficulty: easy, domain: customer-support, tags: [multi-hop]}
+  # ── policy (20) ────────────────────────────────────────────
+  - {query: "전달 후 재생성 승인이 필요한가?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "원천 데이터를 수정해도 되나요?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "VIP 광고주 리포트 자동 전달 규정이 뭐야?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "보정할 때 꼭 지켜야 하는 절차는?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "음수 비용 처리 기준이 있어?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "리포트 재생성 절차가 어떻게 되나?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "VIP 광고주 리포트 자동 전달이 허용되는지 규정 확인해줘", expect: policy, difficulty: medium, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "음수 비용이 나오면 어떤 기준으로 처리해야 하나?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "전달된 리포트를 다시 만들 때 팀장 승인이 필요한 경우는?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "원천 데이터 직접 수정은 금지인가? 관련 원칙 알려줘", expect: policy, difficulty: medium, domain: ad-reporting, tags: [negation]}
+  - {query: "계정 만료 시 소급 수집 절차는?", expect: policy, difficulty: medium, domain: ad-reporting}
+  - {query: "보정 사유 기록은 반드시 해야 하는 규칙이야?", expect: policy, difficulty: easy, domain: ad-reporting}
+  - {query: "P1 티켓 최초 응답 기한 기준이 뭐야?", expect: policy, difficulty: easy, domain: customer-support}
+  - {query: "환불을 상담원이 바로 처리해도 되나요?", expect: policy, difficulty: easy, domain: customer-support}
+  - {query: "티켓을 재오픈할지 신규로 받을지 판정 기준은?", expect: policy, difficulty: easy, domain: customer-support, tags: [ambiguous]}
+  - {query: "30만원 넘는 환불은 누구 승인이 필요한가?", expect: policy, difficulty: medium, domain: customer-support}
+  - {query: "고객이 해지를 언급하면 따라야 하는 절차가 있어?", expect: policy, difficulty: medium, domain: customer-support}
+  - {query: "계약 확인 전 환불 금액을 안내하면 안 된다는 규정이 있나?", expect: policy, difficulty: hard, domain: customer-support, tags: [negation]}
+  - {query: "KB 문서 게시는 누가 승인하나?", expect: policy, difficulty: easy, domain: customer-support}
+  - {query: "에스컬레이션을 해야 하는 신호들 알려줘", expect: policy, difficulty: easy, domain: customer-support}
+  # ── experience (20) ────────────────────────────────────────
+  - {query: "음수 비용 비슷한 사례 있었어?", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "과거에 계정 만료로 리포트 늦은 적 있어?", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "지난번 환불 조정 건은 어떻게 해결했지?", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "예전에 겪은 카카오 이슈 알려줘", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "카카오에서 음수 비용 나왔던 사례 정리해줘", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "전에 리포트 지연됐을 때 어떻게 해결했지?", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "비슷한 검증 실패 겪은 적 있어?", expect: experience, difficulty: medium, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "지난번 구글 계정 이슈 때 뭐가 문제였어?", expect: experience, difficulty: hard, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "과거 환불 조정 건 처리 이력 보여줘", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "매체 API 장애를 겪은 사례와 대응 알려줘", expect: experience, difficulty: easy, domain: ad-reporting}
+  - {query: "예전에 만료 알림 놓쳐서 생긴 문제 있었나?", expect: experience, difficulty: medium, domain: ad-reporting}
+  - {query: "리포트 숫자 정정했던 과거 케이스 알려줘", expect: experience, difficulty: medium, domain: ad-reporting}
+  - {query: "엔터프라이즈 고객 P1 늦게 응답했던 사례 있어?", expect: experience, difficulty: easy, domain: customer-support}
+  - {query: "중복 결제 문의는 과거에 어떻게 처리했어?", expect: experience, difficulty: easy, domain: customer-support}
+  - {query: "지난번 SSO 장애 때 대응 과정 알려줘", expect: experience, difficulty: easy, domain: customer-support}
+  - {query: "비슷한 트리아지 오분류 겪은 적 있나?", expect: experience, difficulty: easy, domain: customer-support}
+  - {query: "고객 이탈 위기를 해결했던 경험 공유해줘", expect: experience, difficulty: medium, domain: customer-support}
+  - {query: "티켓 병합은 전에 어떤 식으로 했지?", expect: experience, difficulty: medium, domain: customer-support}
+  - {query: "환불 이중 처리될 뻔한 이력 있었어?", expect: experience, difficulty: medium, domain: customer-support, tags: [negation]}
+  - {query: "과거 장애 티켓에서 배운 교훈이 뭐야?", expect: experience, difficulty: easy, domain: customer-support}
 retrieval:      # kind 검색에서 기대 문서가 top-3 안에 있어야 함 (hit@3)
-  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md}
-  - {query: "전달된 리포트를 다시 만들어도 되나요?", kind: policy, expectDoc: policies/report-regeneration.md}
-  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md}
-  - {query: "음수 비용 리포트 표기 기준", kind: policy, expectDoc: policies/data-correction.md}
-  - {query: "VIP 광고주 자동 전달", kind: policy, expectDoc: policies/vip-delivery.md}
-  - {query: "음수 비용 환불 사례", kind: experience, expectDoc: cases/2026-03-kakao-refund.md}
-  - {query: "계정 만료 리포트 지연 사례", kind: experience, expectDoc: cases/2026-05-late-delivery.md}
-  - {query: "환불 조정 어떻게 해결했나", kind: experience, expectDoc: cases/2026-03-kakao-refund.md}
+  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md, difficulty: easy, domain: ad-reporting}
+  - {query: "전달된 리포트를 다시 만들어도 되나요?", kind: policy, expectDoc: policies/report-regeneration.md, difficulty: easy, domain: ad-reporting}
+  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md, difficulty: easy, domain: ad-reporting}
+  - {query: "음수 비용 리포트 표기 기준", kind: policy, expectDoc: policies/data-correction.md, difficulty: easy, domain: ad-reporting}
+  - {query: "VIP 광고주 자동 전달", kind: policy, expectDoc: policies/vip-delivery.md, difficulty: easy, domain: ad-reporting}
+  - {query: "음수 비용 환불 사례", kind: experience, expectDoc: cases/2026-03-kakao-refund.md, difficulty: easy, domain: ad-reporting}
+  - {query: "계정 만료 리포트 지연 사례", kind: experience, expectDoc: cases/2026-05-late-delivery.md, difficulty: easy, domain: ad-reporting}
+  - {query: "환불 조정 어떻게 해결했나", kind: experience, expectDoc: cases/2026-03-kakao-refund.md, difficulty: medium, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "팀장 승인 없이 재생성 가능한 경우", kind: policy, expectDoc: policies/report-regeneration.md, difficulty: medium, domain: ad-reporting, tags: [negation]}
+  - {query: "VIP 리포트 사전 검수 조항", kind: policy, expectDoc: policies/vip-delivery.md, difficulty: easy, domain: ad-reporting}
+  - {query: "보정 절차와 감사 요건", kind: policy, expectDoc: policies/data-correction.md, difficulty: easy, domain: ad-reporting}
+  - {query: "계정 만료 48시간 재연결", kind: policy, expectDoc: policies/account-expiry.md, difficulty: medium, domain: ad-reporting}
+  - {query: "매체 어드민에서 조정 내역 확인", kind: experience, expectDoc: cases/2026-03-kakao-refund.md, difficulty: medium, domain: ad-reporting}
+  - {query: "구글 소급 수집 30일", kind: experience, expectDoc: cases/2026-05-late-delivery.md, difficulty: easy, domain: ad-reporting}
+  - {query: "만료 알림 팀 채널 변경", kind: experience, expectDoc: cases/2026-05-late-delivery.md, difficulty: medium, domain: ad-reporting}
+  - {query: "P1 최초 응답 30분 기한", kind: policy, expectDoc: policies/escalation-sla.md, difficulty: easy, domain: customer-support}
+  - {query: "자동 에스컬레이션 조건", kind: policy, expectDoc: policies/escalation-sla.md, difficulty: easy, domain: customer-support}
+  - {query: "계약 해지 언급 시 상위 개입", kind: policy, expectDoc: policies/escalation-sla.md, difficulty: medium, domain: customer-support}
+  - {query: "환불 승인 금액 기준", kind: policy, expectDoc: policies/refund-policy.md, difficulty: easy, domain: customer-support}
+  - {query: "상담원 단독 환불 처리 가능 여부", kind: policy, expectDoc: policies/refund-policy.md, difficulty: easy, domain: customer-support}
+  - {query: "환불 확정 전 계약 refundPolicy 확인", kind: policy, expectDoc: policies/refund-policy.md, difficulty: medium, domain: customer-support, tags: [multi-hop]}
+  - {query: "티켓 재오픈 30일 기준", kind: policy, expectDoc: policies/ticket-reopen.md, difficulty: easy, domain: customer-support}
+  - {query: "재오픈과 신규 접수 판정", kind: policy, expectDoc: policies/ticket-reopen.md, difficulty: easy, domain: customer-support, tags: [ambiguous]}
+  - {query: "SSO 인증서 만료 장애", kind: experience, expectDoc: cases/2026-04-enterprise-p1-escalation.md, difficulty: easy, domain: customer-support}
+  - {query: "트리아지 오분류 P3 P1", kind: experience, expectDoc: cases/2026-04-enterprise-p1-escalation.md, difficulty: medium, domain: customer-support}
+  - {query: "엔터프라이즈 고객 항의 임원 채널", kind: experience, expectDoc: cases/2026-04-enterprise-p1-escalation.md, difficulty: medium, domain: customer-support}
+  - {query: "동일 증상 티켓 여러 건 장애 신호", kind: experience, expectDoc: cases/2026-04-enterprise-p1-escalation.md, difficulty: hard, domain: customer-support, tags: [multi-hop]}
+  - {query: "중복 결제 티켓 병합", kind: experience, expectDoc: cases/2026-06-duplicate-billing-ticket.md, difficulty: easy, domain: customer-support}
+  - {query: "환불 멱등성 이중 확정 차단", kind: experience, expectDoc: cases/2026-06-duplicate-billing-ticket.md, difficulty: medium, domain: customer-support}
+  - {query: "챗 채널 중복 티켓 접수", kind: experience, expectDoc: cases/2026-06-duplicate-billing-ticket.md, difficulty: medium, domain: customer-support}
 retrieval_top1: # 정확도 상위 요건 — 기대 문서가 1위여야 함
-  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md}
-  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md}
+  - {query: "전달 후 재생성 승인이 필요한가?", kind: policy, expectDoc: policies/report-regeneration.md, difficulty: easy, domain: ad-reporting}
+  - {query: "원천 데이터를 수정해도 되나요?", kind: policy, expectDoc: policies/data-correction.md, difficulty: easy, domain: ad-reporting}
+  - {query: "VIP 광고주 자동 전달 금지", kind: policy, expectDoc: policies/vip-delivery.md, difficulty: easy, domain: ad-reporting, tags: [negation]}
+  - {query: "원본 보존 원칙", kind: policy, expectDoc: policies/data-correction.md, difficulty: medium, domain: ad-reporting, tags: [ambiguous]}
+  - {query: "카카오 환불 조정 음수 비용 사례", kind: experience, expectDoc: cases/2026-03-kakao-refund.md, difficulty: easy, domain: ad-reporting}
+  - {query: "P1 티켓 30분 내 최초 응답", kind: policy, expectDoc: policies/escalation-sla.md, difficulty: easy, domain: customer-support}
+  - {query: "환불 승인 기준 30만원", kind: policy, expectDoc: policies/refund-policy.md, difficulty: easy, domain: customer-support}
+  - {query: "티켓 재오픈 판정 기준", kind: policy, expectDoc: policies/ticket-reopen.md, difficulty: easy, domain: customer-support}
+  - {query: "SSO 장애 에스컬레이션 사례", kind: experience, expectDoc: cases/2026-04-enterprise-p1-escalation.md, difficulty: medium, domain: customer-support}
+  - {query: "중복 결제 이중 환불 방지 사례", kind: experience, expectDoc: cases/2026-06-duplicate-billing-ticket.md, difficulty: medium, domain: customer-support, tags: [negation]}
